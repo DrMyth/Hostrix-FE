@@ -3,12 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export function OtpVerifyForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
+  const [error, setError] = useState<string | null>(null);
+  const location = useLocation();
+  const username = location.state?.username || "User";
+  const navigate = useNavigate();
 
   const handleChange = (element: HTMLInputElement, index: number) => {
     if (isNaN(Number(element.value))) return false;
@@ -21,8 +27,37 @@ export function OtpVerifyForm({
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+    const otpValue = otp.join("");
+    console.log("OTP: ", otpValue);
+
+    if (otpValue.length < 6) {
+      setError("Please enter a 6-digit OTP.");
+      return;
+    }
+
+    try{
+      const response = await axios.post("http://localhost:9000/api/v1/auth/confirm", {
+        username,
+        confirmationCode: otpValue
+      });
+
+      if (response.status === 200) {
+        console.log("Verification successful");
+        navigate("/signin");
+      }
+    } catch (e: any) {
+      setError(e.response?.data?.error || "Something went wrong. Please try again later.");
+      console.error("Verification error:", e.response?.data);
+    }
+
+
+  };
+
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
+    <form className={cn("flex flex-col gap-6", className)} {...props} onSubmit={handleSubmit}>
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Verify Your Account</h1>
         <p className="text-muted-foreground text-sm max-w-2xl">
@@ -56,6 +91,7 @@ export function OtpVerifyForm({
             ))}
           </div>
         </div>
+        {error && <p className="text-red-500 text-sm">{error}</p>}
         <Button type="submit" className="w-full">
           Verify OTP
         </Button>

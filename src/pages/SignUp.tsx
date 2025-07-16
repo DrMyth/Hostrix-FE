@@ -1,15 +1,34 @@
 import backgroundImage from "../assets/placeholder.svg";
 import { SignupForm } from "@/components/signup";
 import LoginHeader from "@/components/auth-header";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/dashboard");
+    } else {
+      setIsCheckingAuth(false);
+    }
+  }, []);
+
+  if (isCheckingAuth) {
+    return null;
+  }
+
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
-        <LoginHeader isVerify={true} />
-        <div className="flex flex-1 items-center justify-center">
+        <LoginHeader isVerify={true} setError={setError} />
+        <div className="flex flex-1 items-center justify-center  xl:scale-120">
           <div className="w-full max-w-xs">
-            <SignupForm />
+            <SignupForm error={error} setError={setError} />
           </div>
         </div>
       </div>

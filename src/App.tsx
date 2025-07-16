@@ -5,8 +5,9 @@ import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
 import Verify from './pages/Verify'
 import Dashboard from './pages/Dashboard'
-import Project from './pages/Project'
 import Deploy from './pages/Deploy'
+import Project from './pages/Project';
+import NewProject from './pages/NewProject'
 
 function App() {
   return (
@@ -17,8 +18,9 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/verify" element={<Verify />} />
         <Route path="/dashboard" element={<Dashboard/>} />
-        <Route path="/project/new" element={<Project/>} />
-        <Route path="/deploy/:projectName" element={<Deploy/>} />
+        <Route path="/project/new" element={<NewProject/>} />
+        <Route path="/project/:projectId" element={<Project/>} />
+        <Route path="/deploy/:projectId" element={<Deploy/>} />
       </Routes>
     </BrowserRouter>
   )
